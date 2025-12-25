@@ -105,6 +105,15 @@ public:
         return _waitingLine;
     }
 
+    // 追加251225：フィーダー関連（楠木）
+    void setFeederID(const std::string& id) { _feederID = id; }
+    std::string feedrId() const { return _feederID; }
+    void setGridCostWeight(double weight) { _gridCostWeight = weight; }
+    double gridCostWeight() const { return _gridCostWeight; }
+
+    // 追加251225：配電網コスト計算（楠木）
+    double calculateGridCost() const;
+
 protected:
     // 行き止まりならば true、通り抜け可能なら false
     // CSNodeNormal はすべてfalse
@@ -139,6 +148,10 @@ protected:
     // 待機列
     // 充電中と充電前の両方を含む
     std::vector<VehicleEV*> _waitingLine;
+
+    // 追加251225：フィーダー関連（楠木）
+    std::string _feederID;         // フィーダーID
+    double _gridCostWeight;     // 配電網コスト重み係数
 
     // 充電器 -- Normal/Fastで異なる
 
