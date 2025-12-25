@@ -140,7 +140,7 @@ public:
   double accessory() const { return _accessory; }
 
   //--------------------------------------------------
-  // 挙動・行動関連
+  // 挙動・行動関連(git dev)
 
 public:
   // 経路コスト、CS充電時間コスト、CS充電料金コスト
