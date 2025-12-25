@@ -146,6 +146,12 @@ protected:
       double ratingPower;
     };
     std::unordered_map<std::string, CSListVal> _csList {};
-};
+    /**
+     * @~japanese フィーダーIDマップ
+     * CSの識別番号: フィーダーID
+     * @~english  Feeder ID Map
+     * CS-ID: Feeder-ID
+     */
+    std::unordered_map<std::string, std::string> _csFeederMap {};};
 
 #endif //__INTERSECTION_BUILD_DIRECTOR_HPP__

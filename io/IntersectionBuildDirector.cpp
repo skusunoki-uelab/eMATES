@@ -106,7 +106,8 @@ bool IntersectionBuildDirector::_generateCSList()
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // 不正な行の処理
         // Invalid line handling
-        if (tokens.size() != 3)
+        // 修正251225：フィーダーIDを含む4列フォーマットに対応
+        if (tokens.size() != 3 && tokens.size() != 4)
         {
             cerr << "ERROR: invalid CS list format - "
                  << line << endl;
@@ -128,6 +129,13 @@ bool IntersectionBuildDirector::_generateCSList()
         // 3番目のカラムはCSの定格
         // Third column is CS rating power
         double ratingPower = stod(tokens[2]);
+
+        // 4番目のカラムはフィーダーID（オプション）
+        // Fourth column is Feeder ID (optional)
+        if (tokens.size() == 4) {
+            string feederID = tokens[3];
+            _csFeederMap[id] = feederID;
+        }
 
         // CSリストに登録する
         // Register to CS list

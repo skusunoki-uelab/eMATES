@@ -308,10 +308,10 @@ bool Simulator::run(ulint time)
     {
         incrementStep();
         // 2022/11/29 by uchida
-            //2025/7/30 by komatsu
+        //2025/7/30 by komatsu
         // 待ち行列と利用時間(1分毎に出力)
-          (AppMates::getTimeManager().time()%60000 == 0) //%60000 == 0
-            {
+        if (AppMates::getTimeManager().time()%60000 == 0) //%60000 == 0
+        {
             // 元のベクトルポインタを取得
             vector<CSNodeBase*> fcsNodes = _roadMap->csNodesFast();
             vector<CSNodeBase*> csNodes = _roadMap->csNodes();

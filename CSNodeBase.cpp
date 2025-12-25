@@ -18,6 +18,9 @@ CSNodeBase::CSNodeBase(const std::string& id, const std::string& type, RoadMap* 
   _occupancy = 0;
   _servedEV = 0;
 
+  // 追加251225：フィーダー関連メンバ変数の初期化
+  _feederID = "";
+  _gridCostWeight = 1.0;
 }
 
 ////======================================================================

@@ -167,8 +167,8 @@ CMakeFiles/advmates-calc.dir/clean:
 # Target rules for target CMakeFiles/advmates-sim.dir
 
 # All Build rule for target.
-CMakeFiles/advmates-sim.dir/all: CMakeFiles/mates.dir/all
 CMakeFiles/advmates-sim.dir/all: CMakeFiles/matesgl.dir/all
+CMakeFiles/advmates-sim.dir/all: CMakeFiles/mates.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/advmates-sim.dir/build.make CMakeFiles/advmates-sim.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/advmates-sim.dir/build.make CMakeFiles/advmates-sim.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shin/emates/simulator-2507/simulator-2507/solver/CMakeFiles --progress-num=2 "Built target advmates-sim"
