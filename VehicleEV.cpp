@@ -215,12 +215,13 @@ Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
   double sum_exp = 0.0;
   for (Intersection *cs : candidates) {
     CSCost c = (this->*callback)(router, rear, front, cs);
+    // 追加251226：配電網ペナルティを総コストに加算（楠木）
     double total_cost =
-        std::min(MAX_COST, c.route + c.chargeTime + c.yen + c.waiting);
+        std::min(MAX_COST, c.route + c.chargeTime + c.yen + c.waiting + c.gridPenalty);
     cout << "search CS"
          << " veh " << id() << " CS " << cs->id() << " cost " << total_cost
          << " (Route " << c.route << " ChgTime " << c.chargeTime << " Yen "
-         << c.yen << " Wait " << c.waiting << ")" << endl;
+         << c.yen << " Wait " << c.waiting << " Grid " << c.gridPenalty << ")" << endl;
     costs.push_back(total_cost);
     double exp_cost = exp(-theta * total_cost);
     sum_exp += exp_cost;
@@ -310,7 +311,7 @@ VehicleEV::CSCost VehicleEV::evalByRandom(RouterBase *router,
                                           const Intersection *rear,
                                           const Intersection *front,
                                           const Intersection *target) {
-  return {randomNumberGenerator()->uniform(), 0, 0, 0};
+  return {randomNumberGenerator()->uniform(), 0, 0, 0, 0};
 }
 
 //======================================================================
@@ -318,7 +319,7 @@ VehicleEV::CSCost VehicleEV::evalByEuclid(RouterBase *router,
                                           const Intersection *rear,
                                           const Intersection *front,
                                           const Intersection *target) {
-  return {_location.position().distance(target->center()), 0, 0, 0};
+  return {_location.position().distance(target->center()), 0, 0, 0, 0};
 }
 
 //======================================================================
@@ -330,10 +331,10 @@ VehicleEV::CSCost VehicleEV::evalByCost(RouterBase *router,
   _prepareRouter(router);
   Route route = router->search(rear, front, {front, target});
   if (!route.isValid()) {
-    return {MAX_COST, 0, 0, 0};
+    return {MAX_COST, 0, 0, 0, 0};
   }
 
-  CSCost cost{route.cost(), 0, 0, 0};
+  CSCost cost{route.cost(), 0, 0, 0, 0};
   auto cs = dynamic_cast<const CSNodeBase *>(target);
   if (cs) {
     // CSならその値を読み込む
@@ -341,6 +342,8 @@ VehicleEV::CSCost VehicleEV::evalByCost(RouterBase *router,
                       _routingParams[toUnderlying(RoutingParamIndex::CS_TIME)];
     cost.yen = cs->priceForRouting() *
                _routingParams[toUnderlying(RoutingParamIndex::CS_YEN)];
+    // 追加251226：配電網ペナルティを計算（楠木）
+    cost.gridPenalty = cs->calculateGridCost();
   } else {
     // CS進入ペナルティを加算
     cost.route += CS_ENTRY_PENALTY;
@@ -364,11 +367,11 @@ VehicleEV::CSCost VehicleEV::evalBySumCost(RouterBase *router,
   _prepareRouter(router);
   Route route = router->search(rear, front, {front, target, destination});
   if (!route.isValid()) {
-    return {MAX_COST, 0, 0, 0};
+    return {MAX_COST, 0, 0, 0, 0};
   }
-  // CSCost cost{0, 0, 0, 0};
+  // CSCost cost{0, 0, 0, 0, 0};
   // routeのコストを[m]⇒[s]に変換：秒速10mで走行すると仮定
-  CSCost cost{route.cost() / 10.0, 0, 0, 0};
+  CSCost cost{route.cost() / 10.0, 0, 0, 0, 0};
   // routeによるコストを0にするためにコメントアウト⇒evalWaitingTimeSumCostにつながっている
   auto cs = dynamic_cast<const CSNodeBase *>(target);
   if (cs) {
@@ -377,6 +380,8 @@ VehicleEV::CSCost VehicleEV::evalBySumCost(RouterBase *router,
                       _routingParams[toUnderlying(RoutingParamIndex::CS_TIME)];
     cost.yen = cs->priceForRouting() *
                _routingParams[toUnderlying(RoutingParamIndex::CS_YEN)];
+    // 追加251226：配電網ペナルティを計算（楠木）
+    cost.gridPenalty = cs->calculateGridCost();
   } else {
     // CS進入ペナルティを加算
     cost.route += CS_ENTRY_PENALTY;

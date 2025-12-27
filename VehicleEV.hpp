@@ -143,14 +143,15 @@ public:
   // 挙動・行動関連(git dev)
 
 public:
-  // 経路コスト、CS充電時間コスト、CS充電料金コスト
+  // 経路コスト、CS充電時間コスト、CS充電料金コスト、配電網ペナルティ
   struct CSCost {
     double route;
     double chargeTime;
     double yen;
     double waiting;
-    CSCost(double route_, double chargeTime_, double yen_, double waiting_)
-        : route(route_), chargeTime(chargeTime_), yen(yen_), waiting(waiting_) {
+    double gridPenalty;  // 追加251226：配電網ペナルティ（楠木）
+    CSCost(double route_, double chargeTime_, double yen_, double waiting_, double gridPenalty_ = 0.0)
+        : route(route_), chargeTime(chargeTime_), yen(yen_), waiting(waiting_), gridPenalty(gridPenalty_) {
     }
   };
   // CS探索の戦略メソッドのポインタ型

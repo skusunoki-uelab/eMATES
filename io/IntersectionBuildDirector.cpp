@@ -245,6 +245,18 @@ bool IntersectionBuildDirector::_generateIntersections()
             double ratingPower = csRecord.ratingPower;
             cs->setCapacity(capacity);
             cs->setRatingPower(ratingPower);
+            
+            // 追加251226：フィーダーIDとペナルティ係数を設定（楠木）
+            if (_csFeederMap.count(fmtId) > 0)
+            {
+                std::string feederID = _csFeederMap.at(fmtId);
+                cs->setFeederID(feederID);
+                
+                // フィーダー別ペナルティ係数をGVManagerから取得
+                std::string paramKey = "FEEDER_PENALTY_" + feederID;
+                double penalty = AppMates::getGVManager().getNumeric(paramKey);
+                cs->setGridCostWeight(penalty);
+            }
         }
 
         _roadMap->addIntersection(inter);

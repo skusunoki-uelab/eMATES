@@ -247,6 +247,21 @@ constexpr unsigned int VEHICLE_PASS_TIME_INTERSECTION = 10;
 // 251119　routeのコスト評価のため0にする Kusunoki
 constexpr double CS_ENTRY_PENALTY = 0.0;
 
+// [eMATES] 追加251226：フィーダー別配電網ペナルティのデフォルト値（楠木）
+// F21-F28の7つのフィーダーに対するデフォルト係数
+// Optunaで最適化する際の初期値として使用
+constexpr double DEFAULT_FEEDER_PENALTY_F21 = 1.0;
+constexpr double DEFAULT_FEEDER_PENALTY_F22 = 1.0;
+constexpr double DEFAULT_FEEDER_PENALTY_F23 = 1.0;
+constexpr double DEFAULT_FEEDER_PENALTY_F24 = 1.0;
+constexpr double DEFAULT_FEEDER_PENALTY_F25 = 1.0;
+constexpr double DEFAULT_FEEDER_PENALTY_F26 = 1.0;
+constexpr double DEFAULT_FEEDER_PENALTY_F28 = 1.0;  // 高負荷フィーダーは高めに設定
+
+// グリッドペナルティのスケール係数（route/waiting等のコストとバランスを取るため）
+// 他のコスト項が600-1000程度なので、ペナルティを同等の影響力にする
+constexpr double GRID_PENALTY_SCALE = 100.0;
+
 ///@}
 
 //======================================================================

@@ -8,6 +8,7 @@
 #include "GVInitializer.hpp"
 #include "AppMates.hpp"
 #include "GVManager.hpp"
+#include "Config.hpp"  // 追加251226：フィーダーペナルティのデフォルト値用（楠木）
 #include <iostream>
 #include <sstream>
 
@@ -590,5 +591,15 @@ void GVInitializer::initialize(const string& dataPath, unsigned int loopNum)
     gv.setNewNumeric("EV_COMM_PREDICTION_SLOT_TIME_MINUTE", 30);
     // eMATES-openDSS 連成時のタイムアウト時間（秒）
     gv.setNewNumeric("EV_COMM_TIMEOUT_SECOND", 5*60);
+
+    // 追加251226：フィーダー別配電網ペナルティ係数（楠木）
+    // Feeder-specific grid cost penalty weights for SO optimization
+    gv.setNewNumeric("FEEDER_PENALTY_F21", DEFAULT_FEEDER_PENALTY_F21);
+    gv.setNewNumeric("FEEDER_PENALTY_F22", DEFAULT_FEEDER_PENALTY_F22);
+    gv.setNewNumeric("FEEDER_PENALTY_F23", DEFAULT_FEEDER_PENALTY_F23);
+    gv.setNewNumeric("FEEDER_PENALTY_F24", DEFAULT_FEEDER_PENALTY_F24);
+    gv.setNewNumeric("FEEDER_PENALTY_F25", DEFAULT_FEEDER_PENALTY_F25);
+    gv.setNewNumeric("FEEDER_PENALTY_F26", DEFAULT_FEEDER_PENALTY_F26);
+    gv.setNewNumeric("FEEDER_PENALTY_F28", DEFAULT_FEEDER_PENALTY_F28);
 
 }

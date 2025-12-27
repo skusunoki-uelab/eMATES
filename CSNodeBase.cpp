@@ -99,3 +99,13 @@ int CSNodeBase::servedEV() const
 {
     return _servedEV;
 }
+
+////======================================================================
+// 追加251226：配電網コスト計算（楠木）
+double CSNodeBase::calculateGridCost() const
+{
+    // フィーダー別のペナルティ係数を返す
+    // OpenDSS連成時は外部から_gridCostWeightが設定される想定
+    // スケーリング: route/waitingコスト(600-1000)と同オーダーにする
+    return _gridCostWeight * GRID_PENALTY_SCALE;
+}
