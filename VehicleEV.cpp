@@ -211,6 +211,7 @@ Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
 
   // softmin法による選択肢の絞り込み
   std::vector<double> costs;
+  std::vector<double> route_costs;//追加：routeコストのみを記録
   std::vector<double> probabilities;
   double sum_exp = 0.0;
   for (Intersection *cs : candidates) {
@@ -223,9 +224,13 @@ Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
          << " (Route " << c.route << " ChgTime " << c.chargeTime << " Yen "
          << c.yen << " Wait " << c.waiting << " Grid " << c.gridPenalty << ")" << endl;
     costs.push_back(total_cost);
+    route_costs.push_back(c.route);//追加：routeコストのみを記録
     double exp_cost = exp(-theta * total_cost);
     sum_exp += exp_cost;
   }
+
+  
+
   for (size_t i = 0; i < candidates.size(); i++) {
     double exp_cost = exp(-theta * costs[i]);
     double prob = exp_cost / sum_exp;
@@ -238,12 +243,23 @@ Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
   double chosen_cost = MAX_COST;
   double best_cost = *std::min_element(costs.begin(), costs.end());
   double gap_cost = MAX_COST;
+  //　最小のrouteコストを取得
+  double min_route_cost = *std::min_element(route_costs.begin(), route_costs.end());
+
   for (size_t i = 0; i < candidates.size(); i++) {
     cumulative_prob += probabilities[i];
     if (rand <= cumulative_prob) {
       bestCS = candidates[i];
       chosen_cost = costs[i];
       gap_cost = costs[i] - best_cost;
+
+      // 追加：routeコストと迂回距離を計算
+      double chosen_route_cost = route_costs[i];
+      double detour = chosen_route_cost - min_route_cost;
+
+      setChosenCSRouteCost(chosen_route_cost);
+      setClosestCSRouteCost(min_route_cost);
+      setDetourDistance(detour);
       break;
     }
   }

@@ -100,6 +100,11 @@ void VehicleTripWriter::writeVehicleTripEV(VehicleEV *vehicle) {
         // 相対ギャップを取得
         << "," << vehicle->relativeGap()
         << "," // 18
+        // 追加：迂回距離関連の情報を出力
+        << vehicle->detourDistance() << ","          // 19 迂回距離
+        << vehicle->closestCSRouteCost() << ","     // 20 最寄りCSへの経路コスト
+        << vehicle->chosenCSRouteCost()
+        << "," // 21 選択したCSへの経路コスト
                //   << vehicle->evalByWaitingTimeSumCost(RouterBase, ) << ",";
                //   //18
                // EVが実際に消えた地点を記録(初期設定（GoalID）とは別) //by

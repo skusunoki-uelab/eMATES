@@ -75,6 +75,11 @@ protected:
   double _chosenCSCost = 0.0;
   double _relativeGap = 0.0;
 
+  // 経路探索時の迂回距離追加（楠木：251228）
+  double _detourDistance = 0.0;
+  double _closestCSRouteCost = 0.0;
+  double _chosenCSRouteCost = 0.0;
+
 public:
   //--------------------------------------------------
   // 状態関連
@@ -90,6 +95,14 @@ public:
   void setChosenCSCost(double c) { _chosenCSCost = c; }
   void setRelativeGap(double g) { _relativeGap = g; }
 
+  // 経路探索時の迂回距離setter/getter（楠木：251228）
+  double detourDistance() const { return _detourDistance; }
+  void setDetourDistance(double d) { _detourDistance = d; }
+  double closestCSRouteCost() const { return _closestCSRouteCost; }
+  void setClosestCSRouteCost(double c) { _closestCSRouteCost = c; }
+  double chosenCSRouteCost() const { return _chosenCSRouteCost; }
+  void setChosenCSRouteCost(double c) { _chosenCSRouteCost = c; }
+  
   // 目的CSを返す
   Intersection *targetCS() { return _targetCS; }
   void setTargetCS(Intersection *cs) { _targetCS = cs; }
