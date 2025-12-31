@@ -432,7 +432,7 @@ VehicleEV::CSCost VehicleEV::evalByWaitingTimeSumCost(
     //     待ち時間の重み付けを大きくすることで、待ち時間の影響を強める&[ms]→[s]
     // 251118 chargingTimeForRoutingがwaitingtimeを表していそうなので、修正
     cost.waiting =
-        cs->chargingTimeForRouting(this) *
+        cs->estimatedWaitingTime(this) *
         _routingParams[toUnderlying(RoutingParamIndex::CS_TIME)]; //[s]
   }
 
