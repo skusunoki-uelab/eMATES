@@ -229,27 +229,16 @@ void CSNodeFast::setOutPower(double outPower) {
 
 //======================================================================
 double CSNodeFast::chargingTimeForRouting(VehicleEV *ev) const {
-  // 2025/07/10 by abe 2022年度テスト条件
-  // double batteryCapacityWs
-  //    = static_cast<const VehicleEVBodyProperty*>(ev->body())
-  //    ->batteryCapacityWs();
-  // double requiredPowerWs = (0.8 - ev->SOC()) * batteryCapacityWs;
-  //// 出力制御値[kW]はCSに紐付く
-  // double outPowerW = 1000.0 * _outPower;
-
-  // TODO 2025/07/10 by abe 考え方があっているか要確認
-  // 2023/1/17 by uchida
-  // CSの待機列を考慮した充電待ち時間算出
-  // 出力制御はCS単位であり、現時点でcharger単位で与えることはできない
-  // したがって、ここではoutPowerとchargerの基数（=capacity）の積を利用する
-  double requiredPowerWs = 0;
-  for (VehicleEV *ev2 : _waitingLine) {
-    double batteryCapacityWs =
-        static_cast<const VehicleEVBodyProperty *>(ev2->body())
-            ->batteryCapacityWs();
-    requiredPowerWs += (0.8 - ev2->SOC()) * batteryCapacityWs;
-  }
-  double outPowerW = _outPower * 1000.0 * capacity();
+  // 2025/12/31 修正
+  // CS探索を行ったEV自身の充電時間のみを計算
+  // 充電時間 = 必要充電量 / 現在の充電出力値（秒）
+  
+  double batteryCapacityWs =
+      static_cast<const VehicleEVBodyProperty *>(ev->body())
+          ->batteryCapacityWs();
+  double requiredPowerWs = (0.8 - ev->SOC()) * batteryCapacityWs;
+  // 出力制御値[kW]はCSに紐付く
+  double outPowerW = 1000.0 * _outPower;
 
   return requiredPowerWs / outPowerW;
 }
