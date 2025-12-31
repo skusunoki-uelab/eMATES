@@ -211,12 +211,12 @@ Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
   double theta = theta_per_1000 / 1000.0;
   //   double theta = 1.5;
 
-  // CS候補が空の場合は早期リターン
-  if (candidates.empty()) {
-    AppMates::getRouterManager().releaseRouter(router);
-    cout << "No CS candidates for vehicle " << id() << endl;
-    return nullptr;
-  }
+  // CS候補が空の場合は早期リターン(急速充電off用)
+  // if (candidates.empty()) {
+  //   AppMates::getRouterManager().releaseRouter(router);
+  //   cout << "No CS candidates for vehicle " << id() << endl;
+  //   return nullptr;
+  // }
 
   // softmin法による選択肢の絞り込み
   std::vector<double> costs;
