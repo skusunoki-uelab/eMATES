@@ -423,16 +423,13 @@ VehicleEV::CSCost VehicleEV::evalByWaitingTimeSumCost(
   CSCost cost = evalBySumCost(router, rear, front, target);
 
   // CS待ち時間
+  // 2025/12/31 修正: estimatedWaitingTime()を使用
+  // estimatedWaitingTime()は毎ステップ更新される待機列の推定待ち時間
+  // chargingTimeForRouting()は自車両の充電時間のみ
   auto cs = dynamic_cast<const CSNodeBase *>(target);
   if (cs) {
-    // cost.waiting = cs->estimatedWaitingTime();
-    // cost.waiting =
-    //     cs->estimatedWaitingTime() * 25 /
-    //     1000.0; //
-    //     待ち時間の重み付けを大きくすることで、待ち時間の影響を強める&[ms]→[s]
-    // 251118 chargingTimeForRoutingがwaitingtimeを表していそうなので、修正
     cost.waiting =
-        cs->estimatedWaitingTime(this) *
+        cs->estimatedWaitingTime() *
         _routingParams[toUnderlying(RoutingParamIndex::CS_TIME)]; //[s]
   }
 
