@@ -167,37 +167,53 @@ ChargerBase *CSNodeFast::charger(int cgrId) const {
 
 ////======================================================================
 void CSNodeFast::renewEstimatedWaitingTime() {
-  using std::cout;
-  using std::endl;
   int size = _waitingLine.size();
-  // cout << "waiting line size: " << size << endl;
-  //  初期化
+  
+  // 初期化
   _estimatedWaitingTime = 0;
 
-  // CSが満車でなければ待ち時間はゼロ
-  if (size < _capacity) {
+  // 待機列が空なら待ち時間はゼロ
+  if (size == 0) {
     return;
   }
 
-  // 終了判定にsizeをそのまま用いると、余分に推定待ち時間が加算されてしまう。
-  int realSize = size - _capacity + 1;
-
-  assert(realSize > 0);
-  // TODO indexあってる？
-  // capacity分差し引くとしても、iを先頭から回したら、充電中車両が抽出されてしまうのでは？
-  for (int i = 0; i < realSize; i++) {
+  // 2025/12/31 修正（capacity変更に対応）
+  // _waitingLine構造: [0～capacity-1: 充電中, capacity～: 待機中]
+  // 新規到着車両は待機列の最後尾に並ぶ
+  
+  // ケース1: 空きがある場合（size < capacity）
+  if (size < _capacity) {
+    // 即座に充電開始可能
+    _estimatedWaitingTime = 0;
+    return;
+  }
+  
+  // ケース2: 満車の場合（size >= capacity）
+  // 新規車両は、充電中車両のうち最も早く完了する1台が空くまで待ち、
+  // その後、待機中の全車両の充電完了を待つ必要がある
+  
+  // 充電中車両（capacity台）の残り時間の最小値を計算
+  double minChargingTime = std::numeric_limits<double>::max();
+  for (int i = 0; i < _capacity && i < size; i++) {
     VehicleEV *ev = _waitingLine[i];
     double batteryCapacityWs =
         static_cast<const VehicleEVBodyProperty *>(ev->body())
-            ->batteryCapacityWs();                                  // [Ws]
-    double requiredPowerWs = (0.8 - ev->SOC()) * batteryCapacityWs; // [Ws]
-    // おそらく間違っているので変更する byKusunoki 251119
-    // なぜシミュレーションの1タイムステップを1000で割ってかけているのか不明
-    double outPowerW = (_outPower * 1000); // [W]
-    // double outPowerWs = (_outPower * 1000) *
-    // (AppMates::getTimeManager().unit() / 1000.0); // [Ws] by abe 2025/6/17
-    // 定数 1000.0 と 10 の意味が不明のため、外して計算するように変更した
-    //_estimatedWaitingTime += (1000.0 * requiredPowerWs) / (10 * outPowerWs);
+            ->batteryCapacityWs();
+    double requiredPowerWs = (0.8 - ev->SOC()) * batteryCapacityWs;
+    double outPowerW = _outPower * 1000.0;
+    double chargingTime = requiredPowerWs / outPowerW;
+    minChargingTime = std::min(minChargingTime, chargingTime);
+  }
+  _estimatedWaitingTime = minChargingTime;
+  
+  // 待機中車両（capacity台目以降）の充電時間を順次加算
+  for (int i = _capacity; i < size; i++) {
+    VehicleEV *ev = _waitingLine[i];
+    double batteryCapacityWs =
+        static_cast<const VehicleEVBodyProperty *>(ev->body())
+            ->batteryCapacityWs();
+    double requiredPowerWs = (0.8 - ev->SOC()) * batteryCapacityWs;
+    double outPowerW = _outPower * 1000.0;
     _estimatedWaitingTime += requiredPowerWs / outPowerW;
   }
 }
