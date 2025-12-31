@@ -182,8 +182,10 @@ double VehicleEV::regenerativeRate() const {
 
 //======================================================================
 Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
-  // 探索対象CSの集合
-  std::vector<CSNodeBase *> csNodes = _location.roadMap()->csNodesFast();
+  // 探索対象CSの集合→コメントアウト時は急速充電off
+
+  //std::vector<CSNodeBase *> csNodes = _location.roadMap()->csNodesFast();
+  std::vector<CSNodeBase *> csNodes;//からのまま＝CS候補なし
   std::vector<Intersection *> candidates(csNodes.begin(), csNodes.end());
 
   // // 目的地直行も考慮する（ランダム戦略以外）
