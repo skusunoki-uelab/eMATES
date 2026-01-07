@@ -261,6 +261,8 @@ constexpr double DEFAULT_FEEDER_PENALTY_F28 = 1.0;  // 高負荷フィーダー�
 // グリッドペナルティのスケール係数（route/waiting等のコストとバランスを取るため）
 // 他のコスト項が600-1000程度なので、ペナルティを同等の影響力にする
 constexpr double GRID_PENALTY_SCALE = 100.0;
+// グリッドコストを考慮しない（NE時計算のため）
+//constexpr double GRID_PENALTY_SCALE = 0.0;
 
 ///@}
 

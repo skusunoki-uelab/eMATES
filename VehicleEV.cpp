@@ -188,13 +188,6 @@ Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
   //std::vector<CSNodeBase *> csNodes;//からのまま＝CS候補なし
   std::vector<Intersection *> candidates(csNodes.begin(), csNodes.end());
 
-  // // 目的地直行も考慮する（ランダム戦略以外）
-  // if (callback != &VehicleEV::evalByRandom){
-  //     Intersection* destination =
-  // const_cast<Intersection*>(_globalRoute.goal());
-  //     candidates.push_back(destination);
-  // }
-
   const Intersection *rear = _location.intersection();
   const Intersection *front = _location.section()->anotherIntersection(rear);
 
@@ -209,9 +202,8 @@ Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
   // ソフトマックス法のパラメータ(調整が必要)251112byKusunoki
   double theta_per_1000 = 7.5; // ←ここを調整（0.05～0.3を試す）
   double theta = theta_per_1000 / 1000.0;
-  //   double theta = 1.5;
 
-  // CS候補が空の場合は早期リターン(急速充電off用)
+  // CS候補が空の場合は早期リターン(急速充電off用)byKusunoki
   // if (candidates.empty()) {
   //   AppMates::getRouterManager().releaseRouter(router);
   //   cout << "No CS candidates for vehicle " << id() << endl;
@@ -276,32 +268,6 @@ Intersection *VehicleEV::searchCS(CSSearchStrategyFnPtr callback) {
 
   setChosenCSCost(chosen_cost);
   setRelativeGap(relGap);
-
-  //   for(Intersection* cs : candidates)
-  //   {
-  //       // 各CSの評価値はコールバックで計算
-  //       //
-  //       この中でrouter->search()が呼ばれるため、routerの内部状態はリセットされる
-  //       CSCost costs = (this->*callback)(router, rear, front, cs);
-  //       // 合計コスト
-  //       constexpr double max_cost = MAX_COST; //
-  //       なぜか一度移し替えないとリンカエラーが発生する(g++ 13.3.0) double
-  //       cost = std::min(max_cost,
-  //               costs.route + costs.chargeTime + costs.yen + costs.waiting);
-  //       cout << "search CS"
-  //           << " veh " << id() << " CS " << cs->id()
-  //           << " cost " << cost
-  //           << " (Route " << costs.route
-  //           << " ChgTime " << costs.chargeTime
-  //           << " Yen " << costs.yen
-  //           << " Wait " << costs.waiting
-  //           << ")" << endl;
-  //       if (bestCost > cost)
-  //       {
-  //           bestCost = cost;
-  //           bestCS = cs;
-  //       }
-  //   }
 
   // 経路選択器を返却
   // Return path router
@@ -438,40 +404,4 @@ VehicleEV::CSCost VehicleEV::evalByWaitingTimeSumCost(
   return cost;
 }
 
-//======================================================================
-// VehicleEV::CSCost VehicleEV::evalByFutureWaitingTimeSumCost(
-//        RouterBase* router, const Intersection* rear, const Intersection*
-//        front, const Intersection* target)
-//{
-//    // 現在地〜CS〜目的地のGV
-//    CSCost cost = evalBySumCost(router, rear, front, target);
-//    if (cost.route == MAX_COST)
-//    {
-//        return cost;
-//    }
-//
-//    // CS待ち時間（将来）
-//    const CSNodeBase* cs = dynamic_cast<const CSNodeBase*>(target);
-//    double costToWait = cs->estimatedFutureWaitingTime(cost.route);
-//
-//    // by takusagawa 2018/12/14
-//    // 制御ありの場合の関数をあらためて作成しようとしたが,
-//    //
-//    これ以上似たような関数が増えると分かりづらい気がするのでここで条件分岐する.
-//    // 制御パラメータはConf.hで管理する.
-//    // by takusagawa 2019/1/4
-//    // I制御項を追加
-//    if
-//    (AppMates::getGVManager().getFlag("FLAG_USE_PREDICTION_WITH_CONTROLLER"))
-//    {
-//        costToWait +=
-//            - FUTURE_WAITING_TIME_CONTROL_PARAMETER * (cost.costRoute / 60000)
-//            * cs->getPredictiveGradient(tmpCost)
-//            + FUTURE_WAITING_TIME_INTEGRAL_PARAMETER * cs->IV();
-//        costToWait = std::max(costToWait, 0.0);
-//    }
-//    //  arrivalTime更新が必要かも
-//
-//    cost.route += costToWait;
-//    return cost;
-//}
+
